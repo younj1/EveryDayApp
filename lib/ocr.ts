@@ -6,12 +6,13 @@ export interface OcrReceiptResult {
 }
 
 export function parseReceiptResponse(text: string): OcrReceiptResult {
-  const totalMatch = text.match(/total[:\s]+\$?([\d.]+)/i)
-  const merchantMatch = text.split('\n')[0]?.trim() || null
+  const totalMatch = text.match(/\btotal[:\s]+\$?([\d.]+)/i)
+  // NOTE: assumes merchant name appears on first line of receipt text
+  const merchantMatch = text.split('\n')[0].trim() || null
   const dateMatch = text.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/)
 
   return {
-    total: totalMatch ? parseFloat(totalMatch[1]) : null,
+    total: totalMatch ? (isNaN(parseFloat(totalMatch[1])) ? null : parseFloat(totalMatch[1])) : null,
     merchant: merchantMatch,
     date: dateMatch ? dateMatch[0] : null,
     rawText: text,
@@ -19,21 +20,23 @@ export function parseReceiptResponse(text: string): OcrReceiptResult {
 }
 
 export async function scanReceiptImage(base64Image: string): Promise<OcrReceiptResult> {
-  const apiKey = process.env.EXPO_PUBLIC_GOOGLE_VISION_KEY
-  const response = await fetch(
-    `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
-    {
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
+  if (!supabaseUrl) throw new Error('Supabase URL is not configured')
+
+  let response: Response
+  try {
+    response = await fetch(`${supabaseUrl}/functions/v1/scan-receipt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        requests: [{
-          image: { content: base64Image },
-          features: [{ type: 'TEXT_DETECTION' }],
-        }],
-      }),
-    }
-  )
+      body: JSON.stringify({ image: base64Image }),
+    })
+  } catch (err) {
+    throw new Error('Network error while scanning receipt')
+  }
+
+  if (!response.ok) throw new Error(`Receipt scan failed: ${response.status}`)
+
   const data = await response.json()
-  const text = data.responses?.[0]?.fullTextAnnotation?.text || ''
+  const text: string = data.text ?? ''
   return parseReceiptResponse(text)
 }
