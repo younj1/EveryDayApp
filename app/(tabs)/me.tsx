@@ -2,12 +2,13 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'expo-router'
-import { Settings } from 'lucide-react-native'
+import { Settings, Heart } from 'lucide-react-native'
 import { HabitList } from '@/components/me/HabitList'
 import { useMoodStore } from '@/stores/moodStore'
 import { useTaskStore } from '@/stores/taskStore'
 import { useHabitStore } from '@/stores/habitStore'
 import { FriendRequestBadge } from '@/components/friends/FriendRequestBadge'
+import { SendPartnerImageModal } from '@/components/friends/SendPartnerImageModal'
 import { useFriendStore } from '@/stores/friendStore'
 
 const MOOD_OPTIONS = [
@@ -25,6 +26,7 @@ export default function MeScreen() {
   const { tasks, addTask, toggleTask, removeTask } = useTaskStore()
   const { addHabit } = useHabitStore()
   const { loadPendingRequests } = useFriendStore()
+  const [showSendPhoto, setShowSendPhoto] = useState(false)
   const todayMood = getTodayMood()
 
   useEffect(() => { loadPendingRequests() }, [])
@@ -172,6 +174,13 @@ export default function MeScreen() {
 
         <View className="h-16" />
       </ScrollView>
+      <TouchableOpacity
+        onPress={() => setShowSendPhoto(true)}
+        className="absolute bottom-6 right-4 bg-pink-500 rounded-full w-14 h-14 items-center justify-center shadow-lg"
+      >
+        <Heart size={24} color="white" fill="white" />
+      </TouchableOpacity>
+      <SendPartnerImageModal visible={showSendPhoto} onClose={() => setShowSendPhoto(false)} />
     </SafeAreaView>
   )
 }
