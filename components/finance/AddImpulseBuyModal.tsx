@@ -27,8 +27,15 @@ export function AddImpulseBuyModal({ visible, onClose }: Props) {
     onClose()
   }
 
+  const handleClose = () => {
+    setItemName('')
+    setPrice('')
+    setWaitDays(7)
+    onClose()
+  }
+
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={handleClose}>
       <View className="flex-1 bg-white px-6 pt-8">
         <Text className="text-xl font-bold text-gray-900 mb-2">Add Impulse Buy</Text>
         <Text className="text-gray-500 text-sm mb-6">Set a waiting period before deciding to buy</Text>
@@ -63,7 +70,7 @@ export function AddImpulseBuyModal({ visible, onClose }: Props) {
         <TouchableOpacity className="bg-primary rounded-xl py-4 items-center" onPress={handleSave}>
           <Text className="text-white font-semibold">Start Waiting Period</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="mt-3 items-center" onPress={onClose}>
+        <TouchableOpacity className="mt-3 items-center" onPress={handleClose}>
           <Text className="text-gray-400">Cancel</Text>
         </TouchableOpacity>
       </View>

@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { useState, useEffect } from 'react'
 import { useImpulseBuyStore } from '@/stores/impulseBuyStore'
 
 function getCountdown(remindAt: number): string {
@@ -11,6 +12,12 @@ function getCountdown(remindAt: number): string {
 }
 
 export function ImpulseBuyVault() {
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 60_000)
+    return () => clearInterval(interval)
+  }, [])
+
   const items = useImpulseBuyStore((s) => s.items)
   const updateStatus = useImpulseBuyStore((s) => s.updateStatus)
   const snooze = useImpulseBuyStore((s) => s.snooze)
