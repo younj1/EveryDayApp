@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
+import { scheduleImpulseBuyReminder } from '@/lib/notifications'
 
 export interface ImpulseBuy {
   id: string
@@ -20,21 +21,15 @@ interface ImpulseBuyState {
 
 export const useImpulseBuyStore = create<ImpulseBuyState>((set) => ({
   items: [],
-  addImpulseBuy: ({ itemName, price, waitDays }) =>
+  addImpulseBuy: ({ itemName, price, waitDays }) => {
+    const id = uuidv4()
+    const remindAt = Date.now() + waitDays * 24 * 60 * 60 * 1000
     set((state) => ({
-      items: [
-        ...state.items,
-        {
-          id: uuidv4(),
-          itemName,
-          price,
-          waitDays,
-          createdAt: Date.now(),
-          remindAt: Date.now() + waitDays * 24 * 60 * 60 * 1000,
-          status: 'pending',
-        },
-      ],
-    })),
+      items: [...state.items, { id, itemName, price, waitDays, createdAt: Date.now(), remindAt, status: 'pending' }],
+    }))
+    // Fire and forget — don't block store update on permission prompt
+    scheduleImpulseBuyReminder(id, itemName, price, remindAt).catch(() => {})
+  },
   updateStatus: (id, status) =>
     set((state) => ({
       items: state.items.map((item) => (item.id === id ? { ...item, status } : item)),
