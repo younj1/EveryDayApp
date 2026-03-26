@@ -12,16 +12,47 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.everydayapp",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used to scan receipts, food barcodes, and take meal photos for calorie tracking.",
+        "NSPhotoLibraryUsageDescription": "Used to select meal photos for AI calorie estimation.",
+        "NSPhotoLibraryAddUsageDescription": "Used to save receipt scans to your photo library.",
+        "NSHealthShareUsageDescription": "EveryDayApp reads your steps, heart rate, sleep, and activity data to display on your fitness dashboard.",
+        "NSHealthUpdateUsageDescription": "EveryDayApp writes workout and nutrition data to Apple Health.",
+        "NSLocationWhenInUseUsageDescription": "Used to provide location-aware features.",
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      },
+      "entitlements": {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.access": []
+      }
     },
     "android": {
+      "package": "com.yourname.everydayapp",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.INTERNET",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.VIBRATE",
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_HEART_RATE",
+        "android.permission.health.READ_SLEEP",
+        "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
+        "android.permission.health.READ_DISTANCE"
+      ]
     },
     "scheme": "everydayapp",
     "web": {
@@ -31,7 +62,34 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-sqlite"
-    ]
+      "expo-sqlite",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Used to scan receipts, food barcodes, and take meal photos for calorie tracking."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Used to select meal photos for AI calorie estimation.",
+          "cameraPermission": "Used to take meal photos for AI calorie estimation."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#6366f1",
+          "defaultChannel": "default",
+          "sounds": []
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
+    }
   }
 }
