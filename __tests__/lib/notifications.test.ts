@@ -3,9 +3,16 @@ jest.mock('expo-notifications', () => ({
   getPermissionsAsync: jest.fn(),
   requestPermissionsAsync: jest.fn(),
   scheduleNotificationAsync: jest.fn(),
+  getExpoPushTokenAsync: jest.fn(),
   SchedulableTriggerInputTypes: { DATE: 'date', DAILY: 'daily' },
 }))
 jest.mock('expo-device', () => ({ isDevice: false }))
+jest.mock('@/lib/supabase', () => ({
+  supabase: {
+    auth: { getUser: jest.fn() },
+    from: jest.fn(() => ({ update: jest.fn().mockReturnThis(), eq: jest.fn().mockResolvedValue({}) })),
+  },
+}))
 
 import { formatReminderMessage } from '@/lib/notifications'
 
