@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { searchFood, FoodItem } from '@/lib/foodSearch'
 import { useNutritionStore } from '@/stores/nutritionStore'
 import { BarcodeScanner } from './BarcodeScanner'
+import * as ImagePicker from 'expo-image-picker'
+import { analyzeMealPhoto } from '@/lib/mealPhotoAI'
 
-type Tab = 'search' | 'barcode'
+type Tab = 'search' | 'barcode' | 'photo'
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
 
 interface Props { visible: boolean; onClose: () => void }
@@ -14,6 +16,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<FoodItem[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [selectedMeal, setSelectedMeal] = useState<MealType>('breakfast')
   const addFoodEntry = useNutritionStore((s) => s.addFoodEntry)
   const today = new Date().toISOString().split('T')[0]
@@ -45,6 +48,36 @@ export function AddFoodModal({ visible, onClose }: Props) {
     setQuery('')
     setResults([])
     onClose()
+  }
+
+  const handlePhotoAnalysis = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync()
+    if (!permission.granted) {
+      Alert.alert('Permission required', 'Camera access is needed to photograph your meal.')
+      return
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      base64: true,
+      quality: 0.7,
+      mediaTypes: ['images'],
+    })
+    if (result.canceled || !result.assets[0]?.base64) return
+    setIsAnalyzing(true)
+    try {
+      const estimate = await analyzeMealPhoto(result.assets[0].base64)
+      handleAdd({
+        name: estimate.name,
+        calories: estimate.calories,
+        protein: estimate.protein,
+        carbs: estimate.carbs,
+        fat: estimate.fat,
+        servingGrams: 0,
+      })
+    } catch (err) {
+      Alert.alert('Analysis failed', 'Could not analyse the photo. Please try again.')
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   const handleClose = () => {
