@@ -43,7 +43,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
       carbs: item.carbs,
       fat: item.fat,
       date: today,
-      source: tab === 'barcode' ? 'barcode' : 'search',
+      source: tab === 'barcode' ? 'barcode' : tab === 'photo' ? 'photo' : 'search',
     })
     setQuery('')
     setResults([])
@@ -108,7 +108,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
 
           {/* Tab selector */}
           <View className="flex-row bg-gray-100 rounded-xl p-1 mb-4">
-            {(['search', 'barcode'] as Tab[]).map((t) => (
+            {(['search', 'barcode', 'photo'] as Tab[]).map((t) => (
               <TouchableOpacity
                 key={t}
                 className={`flex-1 py-2 rounded-lg items-center ${tab === t ? 'bg-white shadow' : ''}`}
@@ -164,6 +164,20 @@ export function AddFoodModal({ visible, onClose }: Props) {
             onFound={(item) => handleAdd(item)}
             onClose={handleClose}
           />
+        )}
+
+        {tab === 'photo' && (
+          <View className="flex-1 px-6 items-center justify-center gap-4">
+            <Text className="text-gray-500 text-sm text-center">Take a photo of your meal and Claude AI will estimate the calories and macros</Text>
+            <TouchableOpacity
+              className="bg-primary rounded-xl py-4 px-8 items-center flex-row gap-2"
+              onPress={handlePhotoAnalysis}
+              disabled={isAnalyzing}
+            >
+              {isAnalyzing && <ActivityIndicator color="white" size="small" />}
+              <Text className="text-white font-semibold">{isAnalyzing ? 'Analyzing...' : 'Take Photo'}</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         <TouchableOpacity className="m-6 items-center" onPress={handleClose}>
