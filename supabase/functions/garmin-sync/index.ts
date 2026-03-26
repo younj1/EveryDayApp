@@ -58,7 +58,7 @@ serve(async (req) => {
     const today = new Date().toISOString().split('T')[0]
     const activeMinutes = (daily.moderateIntensityMinutes ?? 0) + (daily.vigorousIntensityMinutes ?? 0)
 
-    await supabase.from('garmin_syncs').upsert({
+    const { error: upsertError } = await supabase.from('garmin_syncs').upsert({
       user_id: userId,
       date: today,
       steps: daily.totalSteps ?? 0,
@@ -70,6 +70,13 @@ serve(async (req) => {
       body_battery: daily.bodyBatteryHighestValue ?? null,
       raw_json: JSON.stringify(daily),
     }, { onConflict: 'user_id,date' })
+
+    if (upsertError) {
+      return new Response(JSON.stringify({ error: upsertError.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
 
     return new Response(JSON.stringify({ synced: true }), {
       headers: { 'Content-Type': 'application/json' },
