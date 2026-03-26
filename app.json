@@ -85,6 +85,19 @@
           "defaultChannel": "default",
           "sounds": []
         }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            { "name": "FitnessWidget", "label": "Fitness", "description": "Today's steps and calories" },
+            { "name": "NutritionWidget", "label": "Nutrition", "description": "Calories and water" },
+            { "name": "FinanceWidget", "label": "Finance", "description": "Today's spending" },
+            { "name": "HabitsWidget", "label": "Habits", "description": "Daily habit progress" },
+            { "name": "MoodWidget", "label": "Mood", "description": "Today's mood" },
+            { "name": "PartnerWidget", "label": "Partner", "description": "Photo from a friend" }
+          ]
+        }
       ]
     ],
     "extra": {
