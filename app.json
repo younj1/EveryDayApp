@@ -62,6 +62,7 @@
     },
     "plugins": [
       "expo-router",
+      "./plugins/withWidgetExtension",
       "expo-secure-store",
       "expo-sqlite",
       [
