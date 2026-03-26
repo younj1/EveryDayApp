@@ -1,12 +1,14 @@
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'expo-router'
 import { Settings } from 'lucide-react-native'
 import { HabitList } from '@/components/me/HabitList'
 import { useMoodStore } from '@/stores/moodStore'
 import { useTaskStore } from '@/stores/taskStore'
 import { useHabitStore } from '@/stores/habitStore'
+import { FriendRequestBadge } from '@/components/friends/FriendRequestBadge'
+import { useFriendStore } from '@/stores/friendStore'
 
 const MOOD_OPTIONS = [
   { value: 1, emoji: '😞' }, { value: 2, emoji: '😕' }, { value: 3, emoji: '😐' },
@@ -22,16 +24,22 @@ export default function MeScreen() {
   const { logMood, addJournalEntry, getTodayMood, journalEntries } = useMoodStore()
   const { tasks, addTask, toggleTask, removeTask } = useTaskStore()
   const { addHabit } = useHabitStore()
+  const { loadPendingRequests } = useFriendStore()
   const todayMood = getTodayMood()
+
+  useEffect(() => { loadPendingRequests() }, [])
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <View className="px-4 pt-6 pb-2">
         <View className="flex-row justify-between items-center mb-4">
           <Text className="text-2xl font-bold text-gray-900">Me</Text>
-          <TouchableOpacity onPress={() => router.push('/settings')}>
-            <Settings size={22} color="#6b7280" />
-          </TouchableOpacity>
+          <View className="relative">
+            <TouchableOpacity onPress={() => router.push('/settings')}>
+              <Settings size={22} color="#6b7280" />
+            </TouchableOpacity>
+            <FriendRequestBadge />
+          </View>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {(['habits', 'tasks', 'mood', 'journal'] as const).map((t) => (

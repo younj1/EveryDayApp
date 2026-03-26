@@ -1,10 +1,13 @@
 import { View, Text, ScrollView, Switch, TouchableOpacity, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { useAuthStore } from '@/stores/authStore'
 import { PlaidConnectButton } from '@/components/finance/PlaidConnectButton'
+import { Users } from 'lucide-react-native'
 
 export default function SettingsScreen() {
+  const router = useRouter()
   const { cloudSyncEnabled, toggleCloudSync, plaidConnected, garminConnected } = useSettingsStore()
   const { signOut } = useAuthStore()
 
@@ -38,6 +41,15 @@ export default function SettingsScreen() {
               {garminConnected ? '✓ Connected' : 'Not connected — configure OAuth in Garmin Connect app'}
             </Text>
           </View>
+        </View>
+
+        <View className="bg-white rounded-2xl mb-4 overflow-hidden">
+          <Text className="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Friends</Text>
+          <TouchableOpacity onPress={() => router.push('/friends')} className="flex-row items-center px-4 py-3">
+            <Users size={18} color="#6366f1" />
+            <Text className="font-medium text-gray-800 ml-3 flex-1">Manage Friends</Text>
+            <Text className="text-gray-400">›</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity
