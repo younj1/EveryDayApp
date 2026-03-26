@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState } from 'react'
+import { useRouter } from 'expo-router'
+import { Settings } from 'lucide-react-native'
 import { HabitList } from '@/components/me/HabitList'
 import { useMoodStore } from '@/stores/moodStore'
 import { useTaskStore } from '@/stores/taskStore'
@@ -12,6 +14,7 @@ const MOOD_OPTIONS = [
 ]
 
 export default function MeScreen() {
+  const router = useRouter()
   const [tab, setTab] = useState<'habits' | 'tasks' | 'mood' | 'journal'>('habits')
   const [newTask, setNewTask] = useState('')
   const [journalText, setJournalText] = useState('')
@@ -24,7 +27,12 @@ export default function MeScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <View className="px-4 pt-6 pb-2">
-        <Text className="text-2xl font-bold text-gray-900 mb-4">Me</Text>
+        <View className="flex-row justify-between items-center mb-4">
+          <Text className="text-2xl font-bold text-gray-900">Me</Text>
+          <TouchableOpacity onPress={() => router.push('/settings')}>
+            <Settings size={22} color="#6b7280" />
+          </TouchableOpacity>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {(['habits', 'tasks', 'mood', 'journal'] as const).map((t) => (
             <TouchableOpacity
