@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Plus } from 'lucide-react-native'
 import { useNutritionStore } from '@/stores/nutritionStore'
 import { CalorieRing } from '@/components/nutrition/CalorieRing'
+import { AddFoodModal } from '@/components/nutrition/AddFoodModal'
 
 const WATER_QUICK_ADD = [250, 500, 750]
 const MEALS = ['breakfast', 'lunch', 'dinner', 'snack'] as const
@@ -114,6 +115,8 @@ export default function NutritionScreen() {
       >
         <Plus color="white" size={24} />
       </TouchableOpacity>
+
+      <AddFoodModal visible={showAddFood} onClose={() => setShowAddFood(false)} />
     </SafeAreaView>
   )
 }
