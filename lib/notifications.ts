@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device'
+import { supabase } from '@/lib/supabase'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -10,6 +11,18 @@ Notifications.setNotificationHandler({
     shouldShowList: true,
   }),
 })
+
+export async function registerPushToken(): Promise<void> {
+  try {
+    const { data: pushToken } = await Notifications.getExpoPushTokenAsync()
+    if (!pushToken) return
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('profiles').update({ push_token: pushToken }).eq('id', user.id)
+  } catch {
+    // silently fail if permissions not granted
+  }
+}
 
 export function formatReminderMessage(itemName: string, price: number): string {
   if (price > 0) {

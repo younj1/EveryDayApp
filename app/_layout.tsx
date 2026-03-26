@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
 import { writeWidgetData, buildWidgetPayload } from '@/lib/widgetSync'
+import { registerPushToken } from '@/lib/notifications'
 import { useFitnessStore } from '@/stores/fitnessStore'
 import { useNutritionStore } from '@/stores/nutritionStore'
 import { useFinanceStore } from '@/stores/financeStore'
@@ -21,7 +22,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      if (session) registerPushToken()
+    })
     return () => subscription.unsubscribe()
   }, [])
 
