@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface Transaction {
   id: string
@@ -22,7 +23,7 @@ export const useFinanceStore = create<FinanceState>((set) => ({
   transactions: [],
   addTransaction: (t) =>
     set((state) => ({
-      transactions: [...state.transactions, { ...t, id: Date.now().toString() }],
+      transactions: [...state.transactions, { ...t, id: uuidv4() }],
     })),
   removeTransaction: (id) =>
     set((state) => ({

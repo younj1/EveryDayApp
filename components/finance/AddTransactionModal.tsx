@@ -13,11 +13,25 @@ export function AddTransactionModal({ visible, onClose }: Props) {
   const [merchant, setMerchant] = useState('')
   const addTransaction = useFinanceStore((s) => s.addTransaction)
 
-  const handleSave = () => {
-    if (!amount) return
-    addTransaction({ type, amount: parseFloat(amount), category, merchant, date: Date.now(), source: 'manual' })
+  const resetForm = () => {
     setAmount('')
     setMerchant('')
+    setType('expense')
+    setCategory('Food')
+  }
+
+  const handleSave = () => {
+    const parsed = parseFloat(amount)
+    if (!Number.isFinite(parsed) || parsed <= 0) return
+    addTransaction({
+      type,
+      amount: parsed,
+      category,
+      ...(merchant.trim() ? { merchant: merchant.trim() } : {}),
+      date: Date.now(),
+      source: 'manual',
+    })
+    resetForm()
     onClose()
   }
 
@@ -70,7 +84,7 @@ export function AddTransactionModal({ visible, onClose }: Props) {
         <TouchableOpacity className="bg-primary rounded-xl py-4 items-center" onPress={handleSave}>
           <Text className="text-white font-semibold">Save</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="mt-3 items-center" onPress={onClose}>
+        <TouchableOpacity className="mt-3 items-center" onPress={() => { resetForm(); onClose() }}>
           <Text className="text-gray-400">Cancel</Text>
         </TouchableOpacity>
       </View>
