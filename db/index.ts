@@ -11,6 +11,10 @@ import { HabitLog } from './models/HabitLog'
 import { MoodLog } from './models/MoodLog'
 import { JournalEntry } from './models/JournalEntry'
 import { Task } from './models/Task'
+import { CycleEntry } from './models/CycleEntry'
+import { PeriodLog } from './models/PeriodLog'
+import { BirthControlReminder } from './models/BirthControlReminder'
+import { UserCycleSettings } from './models/UserCycleSettings'
 
 const adapter = new SQLiteAdapter({
   schema,
@@ -32,5 +36,9 @@ export const database = new Database({
     MoodLog,
     JournalEntry,
     Task,
+    CycleEntry,
+    PeriodLog,
+    BirthControlReminder,
+    UserCycleSettings,
   ],
 })
