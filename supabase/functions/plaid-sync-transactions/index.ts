@@ -1,11 +1,29 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'npm:@supabase/supabase-js'
 
-const PLAID_BASE = 'https://sandbox.plaid.com'
+const PLAID_BASE = Deno.env.get('PLAID_BASE_URL') ?? 'https://sandbox.plaid.com'
+
+interface PlaidTransaction {
+  transaction_id: string
+  amount: number
+  category?: string[]
+  merchant_name?: string
+  name: string
+  date: string
+}
 
 serve(async (req) => {
   try {
-    const { userId } = await req.json()
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+    }
+    const supabaseAdmin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(authHeader.replace('Bearer ', ''))
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+    }
+    const userId = user.id  // authoritative — do not use body userId
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -50,12 +68,12 @@ serve(async (req) => {
     const { transactions } = await response.json()
 
     // Upsert transactions into Supabase
-    const rows = transactions.map((t: Record<string, unknown>) => ({
+    const rows = (transactions as PlaidTransaction[]).map((t) => ({
       user_id: userId,
       plaid_transaction_id: t.transaction_id,
-      type: (t.amount as number) > 0 ? 'expense' : 'income',
-      amount: Math.abs(t.amount as number),
-      category: (t.category as string[])?.[0] ?? 'Other',
+      type: t.amount > 0 ? 'expense' : 'income',
+      amount: Math.abs(t.amount),
+      category: t.category?.[0] ?? 'Other',
       merchant: t.merchant_name ?? t.name,
       date: t.date,
       source: 'plaid',

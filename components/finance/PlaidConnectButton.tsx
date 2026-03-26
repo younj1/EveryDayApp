@@ -33,6 +33,8 @@ export function PlaidConnectButton() {
           await syncTransactions(user.id)
           setIsConnected(true)
           Alert.alert('Success', 'Bank account connected and transactions synced!')
+        } else {
+          Alert.alert('Connection failed', 'Bank connection was not completed. Please try again.')
         }
       }
     } catch (err) {
