@@ -1,7 +1,7 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb'
 
 export const schema = appSchema({
-  version: 1,
+  version: 2,
   tables: [
     tableSchema({
       name: 'transactions',
@@ -107,6 +107,51 @@ export const schema = appSchema({
         { name: 'completed', type: 'boolean' },
         { name: 'due_date', type: 'number', isOptional: true },
         { name: 'created_at', type: 'number' },
+      ],
+    }),
+    tableSchema({
+      name: 'cycle_entries',
+      columns: [
+        { name: 'start_date', type: 'string' },
+        { name: 'end_date', type: 'string', isOptional: true },
+        { name: 'cycle_length', type: 'number', isOptional: true },
+        { name: 'period_length', type: 'number', isOptional: true },
+        { name: 'notes', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+      ],
+    }),
+    tableSchema({
+      name: 'period_logs',
+      columns: [
+        { name: 'cycle_entry_id', type: 'string', isIndexed: true },
+        { name: 'date', type: 'string' },
+        { name: 'flow', type: 'string', isOptional: true },
+        { name: 'symptoms', type: 'string', isOptional: true },
+        { name: 'mood', type: 'string', isOptional: true },
+        { name: 'temperature', type: 'number', isOptional: true },
+        { name: 'discharge', type: 'string', isOptional: true },
+        { name: 'notes', type: 'string', isOptional: true },
+        { name: 'created_at', type: 'number' },
+      ],
+    }),
+    tableSchema({
+      name: 'birth_control_reminders',
+      columns: [
+        { name: 'label', type: 'string' },
+        { name: 'time', type: 'string' },
+        { name: 'message', type: 'string' },
+        { name: 'enabled', type: 'boolean' },
+        { name: 'created_at', type: 'number' },
+      ],
+    }),
+    tableSchema({
+      name: 'user_cycle_settings',
+      columns: [
+        { name: 'average_cycle_length', type: 'number' },
+        { name: 'average_period_length', type: 'number' },
+        { name: 'temperature_unit', type: 'string' },
+        { name: 'notifications_enabled', type: 'boolean' },
+        { name: 'symptom_reminder_time', type: 'string', isOptional: true },
       ],
     }),
   ],
