@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Plus } from 'lucide-react-native'
@@ -25,6 +26,7 @@ function MacroBar({ label, value, goal, color }: { label: string; value: number;
 export default function NutritionScreen() {
   const today = new Date().toISOString().split('T')[0]
   const { entries, goals, getTotalCalories, getTotalWater, getMacros, addWater, removeFoodEntry } = useNutritionStore()
+  const [showAddFood, setShowAddFood] = useState(false)
 
   const todayEntries = entries.filter((e) => e.date === today)
   const totalCalories = getTotalCalories(today)
@@ -108,6 +110,7 @@ export default function NutritionScreen() {
       {/* FAB */}
       <TouchableOpacity
         className="absolute bottom-8 right-6 bg-primary w-14 h-14 rounded-full items-center justify-center shadow-lg"
+        onPress={() => setShowAddFood(true)}
       >
         <Plus color="white" size={24} />
       </TouchableOpacity>
