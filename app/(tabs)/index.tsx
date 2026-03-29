@@ -38,7 +38,8 @@ export default function HomeScreen() {
   const steps = useFitnessStore((s) => s.todayStats?.steps ?? 0)
 
   // Habits
-  const habits = useHabitStore((s) => s.habits.filter((h) => !h.archived))
+  const allHabits = useHabitStore((s) => s.habits)
+  const habits = allHabits.filter((h) => !h.archived)
   const isCompleted = useHabitStore((s) => s.isCompleted)
   const completedHabits = habits.filter((h) => isCompleted(h.id, today)).length
 
