@@ -27,8 +27,10 @@ export default function HomeScreen() {
     .reduce((sum, t) => sum + t.amount, 0)
 
   // Nutrition
-  const totalCalories = useNutritionStore((s) => s.getTotalCalories(today))
-  const totalWater = useNutritionStore((s) => s.getTotalWater(today))
+  const getTotalCalories = useNutritionStore((s) => s.getTotalCalories)
+  const getTotalWater = useNutritionStore((s) => s.getTotalWater)
+  const totalCalories = getTotalCalories(today)
+  const totalWater = getTotalWater(today)
   const calGoal = useSettingsStore((s) => s.dailyCalorieGoal)
   const waterGoal = useSettingsStore((s) => s.dailyWaterGoalMl)
 
@@ -41,7 +43,8 @@ export default function HomeScreen() {
   const completedHabits = habits.filter((h) => isCompleted(h.id, today)).length
 
   // Mood
-  const todayMood = useMoodStore((s) => s.getTodayMood())
+  const getTodayMood = useMoodStore((s) => s.getTodayMood)
+  const todayMood = getTodayMood()
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
