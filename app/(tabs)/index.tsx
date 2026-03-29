@@ -37,9 +37,8 @@ export default function HomeScreen() {
 
   // Habits
   const habits = useHabitStore((s) => s.habits.filter((h) => !h.archived))
-  const completedHabits = useHabitStore((s) =>
-    habits.filter((h) => s.isCompleted(h.id, today)).length
-  )
+  const isCompleted = useHabitStore((s) => s.isCompleted)
+  const completedHabits = habits.filter((h) => isCompleted(h.id, today)).length
 
   // Mood
   const todayMood = useMoodStore((s) => s.getTodayMood())
