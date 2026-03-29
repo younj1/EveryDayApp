@@ -21,7 +21,10 @@
         "NSHealthShareUsageDescription": "EveryDayApp reads your steps, heart rate, sleep, and activity data to display on your fitness dashboard.",
         "NSHealthUpdateUsageDescription": "EveryDayApp writes workout and nutrition data to Apple Health.",
         "NSLocationWhenInUseUsageDescription": "Used to provide location-aware features.",
-        "UIBackgroundModes": ["fetch", "remote-notification"]
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
       },
       "entitlements": {
         "com.apple.developer.healthkit": true,
@@ -51,7 +54,8 @@
         "android.permission.health.READ_HEART_RATE",
         "android.permission.health.READ_SLEEP",
         "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
-        "android.permission.health.READ_DISTANCE"
+        "android.permission.health.READ_DISTANCE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "scheme": "everydayapp",
@@ -88,8 +92,10 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
-      }
-    }
+        "projectId": "6f25dc32-9c86-4f72-be64-59bebec9bc66"
+      },
+      "router": {}
+    },
+    "owner": "aefiu"
   }
 }
