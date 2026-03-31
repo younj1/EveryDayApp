@@ -5,6 +5,7 @@ import { useNutritionStore } from '@/stores/nutritionStore'
 import { BarcodeScanner } from './BarcodeScanner'
 import * as ImagePicker from 'expo-image-picker'
 import { analyzeMealPhoto } from '@/lib/mealPhotoAI'
+import { NavigationContainer } from '@react-navigation/native'
 
 type Tab = 'search' | 'barcode' | 'photo'
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
