@@ -92,7 +92,13 @@ export default function MeScreen() {
                 <Text className="text-white font-bold text-lg">+</Text>
               </TouchableOpacity>
             </View>
-            {tasks.length === 0 && <Text className="text-gray-400 text-center py-8">No tasks yet</Text>}
+            {tasks.length === 0 && (
+              <View className="items-center py-12">
+                <Text className="text-3xl mb-2">✅</Text>
+                <Text className="text-gray-500 font-medium mb-1">No tasks yet</Text>
+                <Text className="text-xs text-gray-400 text-center">Add a task above to start your to-do list</Text>
+              </View>
+            )}
             {tasks.map((task) => (
               <View key={task.id} className="flex-row items-center bg-white rounded-xl px-4 py-3 mb-2">
                 <TouchableOpacity
@@ -155,7 +161,9 @@ export default function MeScreen() {
             </TouchableOpacity>
             {journalEntries.slice().reverse().map((entry) => (
               <View key={entry.id} className="bg-white rounded-xl p-4 mb-2">
-                <Text className="text-xs text-gray-400 mb-1">{entry.date}</Text>
+                <Text className="text-xs text-gray-400 mb-1">
+                  {new Date(entry.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </Text>
                 <Text className="text-gray-700">{entry.content}</Text>
               </View>
             ))}

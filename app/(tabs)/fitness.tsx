@@ -15,7 +15,7 @@ const STATS_CONFIG = [
 ]
 
 export default function FitnessScreen() {
-  const { todayStats, setTodayStats, setLastSyncAt } = useFitnessStore()
+  const { todayStats, setTodayStats, setLastSyncAt, lastSyncAt } = useFitnessStore()
   const [isSyncing, setIsSyncing] = useState(false)
 
   const syncGarmin = async () => {
@@ -56,21 +56,36 @@ export default function FitnessScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1 px-4 pt-6">
-        <Text className="text-2xl font-bold text-gray-900 mb-6">Fitness</Text>
-
-        <View className="flex-row flex-wrap gap-3 mb-6">
-          {STATS_CONFIG.map(({ key, label, format }) => {
-            const val = todayStats?.[key]
-            return (
-              <View key={label} className="bg-white rounded-2xl p-4 w-[47%]">
-                <Text className="text-xs text-gray-500">{label}</Text>
-                <Text className="text-xl font-bold text-gray-900 mt-1">
-                  {val != null ? format(val) : '—'}
-                </Text>
-              </View>
-            )
-          })}
+        <View className="flex-row justify-between items-center mb-6">
+          <Text className="text-2xl font-bold text-gray-900">Fitness</Text>
+          {lastSyncAt && (
+            <Text className="text-xs text-gray-400">
+              Synced {new Date(lastSyncAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+          )}
         </View>
+
+        {!todayStats ? (
+          <View className="items-center py-16 px-8 mb-6">
+            <Text className="text-4xl mb-3">🏃</Text>
+            <Text className="text-lg font-semibold text-gray-700 mb-1">No fitness data yet</Text>
+            <Text className="text-sm text-gray-400 text-center">Sync your Garmin watch to see today's stats</Text>
+          </View>
+        ) : (
+          <View className="flex-row flex-wrap gap-3 mb-6">
+            {STATS_CONFIG.map(({ key, label, format }) => {
+              const val = todayStats[key]
+              return (
+                <View key={label} className="bg-white rounded-2xl p-4 w-[47%]">
+                  <Text className="text-xs text-gray-500">{label}</Text>
+                  <Text className="text-xl font-bold text-gray-900 mt-1">
+                    {val != null ? format(val) : '—'}
+                  </Text>
+                </View>
+              )
+            })}
+          </View>
+        )}
 
         <TouchableOpacity
           className="bg-primary rounded-xl py-4 items-center flex-row justify-center gap-2"

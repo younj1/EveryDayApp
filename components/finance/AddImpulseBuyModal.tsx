@@ -1,4 +1,4 @@
-import { View, Text, Modal, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Modal, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import { useState } from 'react'
 import { useImpulseBuyStore } from '@/stores/impulseBuyStore'
 
@@ -36,44 +36,61 @@ export function AddImpulseBuyModal({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={handleClose}>
-      <View className="flex-1 bg-white px-6 pt-8">
-        <Text className="text-xl font-bold text-gray-900 mb-2">Add Impulse Buy</Text>
-        <Text className="text-gray-500 text-sm mb-6">Set a waiting period before deciding to buy</Text>
+      <View style={s.container}>
+        <Text style={s.title}>Add Impulse Buy</Text>
+        <Text style={s.subtitle}>Set a waiting period before deciding to buy</Text>
 
         <TextInput
-          className="border border-gray-200 rounded-xl px-4 py-3 mb-4"
+          style={s.input}
           placeholder="What do you want to buy?"
           value={itemName}
           onChangeText={setItemName}
         />
         <TextInput
-          className="border border-gray-200 rounded-xl px-4 py-3 mb-6"
+          style={s.input}
           placeholder="Price ($)"
           value={price}
           onChangeText={setPrice}
           keyboardType="decimal-pad"
         />
 
-        <Text className="font-medium text-gray-700 mb-3">Wait how long?</Text>
-        <View className="flex-row flex-wrap gap-2 mb-8">
+        <Text style={s.label}>Wait how long?</Text>
+        <View style={s.waitRow}>
           {WAIT_OPTIONS.map((opt) => (
             <TouchableOpacity
               key={opt.days}
-              className={`px-4 py-2 rounded-full border ${waitDays === opt.days ? 'bg-primary border-primary' : 'border-gray-200'}`}
+              style={[s.waitChip, waitDays === opt.days && s.waitChipActive]}
               onPress={() => setWaitDays(opt.days)}
             >
-              <Text className={waitDays === opt.days ? 'text-white' : 'text-gray-600'}>{opt.label}</Text>
+              <Text style={waitDays === opt.days ? s.waitChipTextActive : s.waitChipText}>{opt.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity className="bg-primary rounded-xl py-4 items-center" onPress={handleSave}>
-          <Text className="text-white font-semibold">Start Waiting Period</Text>
+        <TouchableOpacity style={s.saveBtn} onPress={handleSave}>
+          <Text style={s.saveBtnText}>Start Waiting Period</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="mt-3 items-center" onPress={handleClose}>
-          <Text className="text-gray-400">Cancel</Text>
+        <TouchableOpacity style={s.cancelBtn} onPress={handleClose}>
+          <Text style={s.cancelBtnText}>Cancel</Text>
         </TouchableOpacity>
       </View>
     </Modal>
   )
 }
+
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 24, paddingTop: 32 },
+  title: { fontSize: 20, fontWeight: 'bold', color: '#111827', marginBottom: 4 },
+  subtitle: { fontSize: 14, color: '#6b7280', marginBottom: 24 },
+  input: { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 16, fontSize: 16 },
+  label: { fontWeight: '500', color: '#374151', marginBottom: 12 },
+  waitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 32 },
+  waitChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: '#e5e7eb' },
+  waitChipActive: { backgroundColor: '#6366f1', borderColor: '#6366f1' },
+  waitChipText: { color: '#4b5563' },
+  waitChipTextActive: { color: '#fff' },
+  saveBtn: { backgroundColor: '#6366f1', borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
+  saveBtnText: { color: '#fff', fontWeight: '600' },
+  cancelBtn: { marginTop: 12, alignItems: 'center' },
+  cancelBtnText: { color: '#9ca3af' },
+})

@@ -99,7 +99,13 @@ export default function NutritionScreen() {
                 </View>
               ))}
               {mealEntries.length === 0 && (
-                <Text className="text-xs text-gray-300 py-1">Nothing logged yet</Text>
+                <TouchableOpacity
+                  className="flex-row items-center gap-2 py-2"
+                  onPress={() => setShowAddFood(true)}
+                >
+                  <Text className="text-gray-300 text-lg">+</Text>
+                  <Text className="text-xs text-gray-300">Tap to log {meal}</Text>
+                </TouchableOpacity>
               )}
             </View>
           )

@@ -1,11 +1,10 @@
-import { View, Text, Modal, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Alert } from 'react-native'
+import { View, Text, Modal, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Alert, StyleSheet } from 'react-native'
 import { useState } from 'react'
 import { searchFood, FoodItem } from '@/lib/foodSearch'
 import { useNutritionStore } from '@/stores/nutritionStore'
 import { BarcodeScanner } from './BarcodeScanner'
 import * as ImagePicker from 'expo-image-picker'
 import { analyzeMealPhoto } from '@/lib/mealPhotoAI'
-import { NavigationContainer } from '@react-navigation/native'
 
 type Tab = 'search' | 'barcode' | 'photo'
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
@@ -74,7 +73,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
         fat: estimate.fat,
         servingGrams: 0,
       })
-    } catch (err) {
+    } catch {
       Alert.alert('Analysis failed', 'Could not analyse the photo. Please try again.')
     } finally {
       setIsAnalyzing(false)
@@ -90,101 +89,117 @@ export function AddFoodModal({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={handleClose}>
-      <View className="flex-1 bg-white">
-        <View className="px-6 pt-6 pb-2">
-          <Text className="text-xl font-bold text-gray-900 mb-4">Add Food</Text>
+      <View style={s.container}>
+        <View style={s.header}>
+          <Text style={s.title}>Add Food</Text>
 
-          {/* Meal selector */}
-          <View className="flex-row gap-1 mb-4">
+          <View style={s.mealRow}>
             {(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map((m) => (
               <TouchableOpacity
                 key={m}
-                className={`flex-1 py-1 rounded-lg items-center ${selectedMeal === m ? 'bg-primary' : 'bg-gray-100'}`}
+                style={[s.mealBtn, selectedMeal === m && s.mealBtnActive]}
                 onPress={() => setSelectedMeal(m)}
               >
-                <Text className={`text-xs font-medium capitalize ${selectedMeal === m ? 'text-white' : 'text-gray-600'}`}>{m}</Text>
+                <Text style={[s.mealBtnText, selectedMeal === m && s.mealBtnTextActive]}>{m}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* Tab selector */}
-          <View className="flex-row bg-gray-100 rounded-xl p-1 mb-4">
+          <View style={s.tabRow}>
             {(['search', 'barcode', 'photo'] as Tab[]).map((t) => (
               <TouchableOpacity
                 key={t}
-                className={`flex-1 py-2 rounded-lg items-center ${tab === t ? 'bg-white shadow' : ''}`}
+                style={[s.tabBtn, tab === t && s.tabBtnActive]}
                 onPress={() => setTab(t)}
               >
-                <Text className={`text-sm font-medium capitalize ${tab === t ? 'text-gray-900' : 'text-gray-400'}`}>{t}</Text>
+                <Text style={[s.tabBtnText, tab === t && s.tabBtnTextActive]}>{t}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         {tab === 'search' && (
-          <View className="flex-1 px-6">
-            <View className="flex-row gap-2 mb-4">
+          <View style={s.searchContainer}>
+            <View style={s.searchRow}>
               <TextInput
-                className="flex-1 border border-gray-200 rounded-xl px-4 py-3"
+                style={s.searchInput}
                 placeholder="Search foods..."
                 value={query}
                 onChangeText={setQuery}
                 onSubmitEditing={handleSearch}
                 returnKeyType="search"
               />
-              <TouchableOpacity
-                className="bg-primary rounded-xl px-4 items-center justify-center"
-                onPress={handleSearch}
-                disabled={isSearching}
-              >
-                {isSearching ? <ActivityIndicator color="white" size="small" /> : <Text className="text-white font-medium">Go</Text>}
+              <TouchableOpacity style={s.goBtn} onPress={handleSearch} disabled={isSearching}>
+                {isSearching ? <ActivityIndicator color="white" size="small" /> : <Text style={s.goBtnText}>Go</Text>}
               </TouchableOpacity>
             </View>
             <FlatList
               data={results}
               keyExtractor={(_, i) => i.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  className="flex-row justify-between items-center py-3 border-b border-gray-100"
-                  onPress={() => handleAdd(item)}
-                >
+                <TouchableOpacity style={s.resultRow} onPress={() => handleAdd(item)}>
                   <View>
-                    <Text className="font-medium text-gray-800">{item.name}</Text>
-                    <Text className="text-xs text-gray-400">P:{item.protein}g C:{item.carbs}g F:{item.fat}g</Text>
+                    <Text style={s.resultName}>{item.name}</Text>
+                    <Text style={s.resultMacros}>P:{item.protein}g C:{item.carbs}g F:{item.fat}g</Text>
                   </View>
-                  <Text className="text-gray-600 font-medium">{item.calories} kcal</Text>
+                  <Text style={s.resultCals}>{item.calories} kcal</Text>
                 </TouchableOpacity>
               )}
-              ListEmptyComponent={<Text className="text-gray-400 text-center py-8">Search for a food to add it</Text>}
+              ListEmptyComponent={<Text style={s.emptyText}>Search for a food to add it</Text>}
             />
           </View>
         )}
 
         {tab === 'barcode' && (
-          <BarcodeScanner
-            onFound={(item) => handleAdd(item)}
-            onClose={handleClose}
-          />
+          <BarcodeScanner onFound={(item) => handleAdd(item)} onClose={handleClose} />
         )}
 
         {tab === 'photo' && (
-          <View className="flex-1 px-6 items-center justify-center gap-4">
-            <Text className="text-gray-500 text-sm text-center">Take a photo of your meal and Claude AI will estimate the calories and macros</Text>
-            <TouchableOpacity
-              className="bg-primary rounded-xl py-4 px-8 items-center flex-row gap-2"
-              onPress={handlePhotoAnalysis}
-              disabled={isAnalyzing}
-            >
+          <View style={s.photoContainer}>
+            <Text style={s.photoDesc}>Take a photo of your meal and Claude AI will estimate the calories and macros</Text>
+            <TouchableOpacity style={s.photoBtn} onPress={handlePhotoAnalysis} disabled={isAnalyzing}>
               {isAnalyzing && <ActivityIndicator color="white" size="small" />}
-              <Text className="text-white font-semibold">{isAnalyzing ? 'Analyzing...' : 'Take Photo'}</Text>
+              <Text style={s.photoBtnText}>{isAnalyzing ? 'Analyzing...' : 'Take Photo'}</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        <TouchableOpacity className="m-6 items-center" onPress={handleClose}>
-          <Text className="text-gray-400">Cancel</Text>
+        <TouchableOpacity style={s.cancelBtn} onPress={handleClose}>
+          <Text style={s.cancelBtnText}>Cancel</Text>
         </TouchableOpacity>
       </View>
     </Modal>
   )
 }
+
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fff' },
+  header: { paddingHorizontal: 24, paddingTop: 24, paddingBottom: 8 },
+  title: { fontSize: 20, fontWeight: 'bold', color: '#111827', marginBottom: 16 },
+  mealRow: { flexDirection: 'row', gap: 4, marginBottom: 16 },
+  mealBtn: { flex: 1, paddingVertical: 4, borderRadius: 8, alignItems: 'center', backgroundColor: '#f3f4f6' },
+  mealBtnActive: { backgroundColor: '#6366f1' },
+  mealBtnText: { fontSize: 11, fontWeight: '500', color: '#4b5563', textTransform: 'capitalize' },
+  mealBtnTextActive: { color: '#fff' },
+  tabRow: { flexDirection: 'row', backgroundColor: '#f3f4f6', borderRadius: 12, padding: 4, marginBottom: 16 },
+  tabBtn: { flex: 1, paddingVertical: 8, borderRadius: 8, alignItems: 'center' },
+  tabBtnActive: { backgroundColor: '#fff', elevation: 2 },
+  tabBtnText: { fontSize: 14, fontWeight: '500', color: '#9ca3af', textTransform: 'capitalize' },
+  tabBtnTextActive: { color: '#111827' },
+  searchContainer: { flex: 1, paddingHorizontal: 24 },
+  searchRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  searchInput: { flex: 1, borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12 },
+  goBtn: { backgroundColor: '#6366f1', borderRadius: 12, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center' },
+  goBtnText: { color: '#fff', fontWeight: '500' },
+  resultRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  resultName: { fontWeight: '500', color: '#1f2937' },
+  resultMacros: { fontSize: 12, color: '#9ca3af' },
+  resultCals: { color: '#4b5563', fontWeight: '500' },
+  emptyText: { color: '#9ca3af', textAlign: 'center', paddingVertical: 32 },
+  photoContainer: { flex: 1, paddingHorizontal: 24, alignItems: 'center', justifyContent: 'center', gap: 16 },
+  photoDesc: { color: '#6b7280', fontSize: 14, textAlign: 'center' },
+  photoBtn: { backgroundColor: '#6366f1', borderRadius: 12, paddingVertical: 16, paddingHorizontal: 32, flexDirection: 'row', gap: 8, alignItems: 'center' },
+  photoBtnText: { color: '#fff', fontWeight: '600' },
+  cancelBtn: { margin: 24, alignItems: 'center' },
+  cancelBtnText: { color: '#9ca3af' },
+})

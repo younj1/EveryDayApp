@@ -10,7 +10,9 @@ export function HabitList() {
   if (activeHabits.length === 0) {
     return (
       <View className="items-center py-12">
-        <Text className="text-gray-400">No habits yet. Add one to get started!</Text>
+        <Text className="text-3xl mb-2">🌱</Text>
+        <Text className="text-gray-500 font-medium mb-1">No habits yet</Text>
+        <Text className="text-xs text-gray-400 text-center">Add a habit above to start building your streak</Text>
       </View>
     )
   }

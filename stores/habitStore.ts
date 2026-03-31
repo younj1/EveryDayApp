@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { v4 as uuidv4 } from 'uuid'
 
 export interface Habit {
@@ -28,45 +30,50 @@ interface HabitState {
   getStreak: (habitId: string) => number
 }
 
-export const useHabitStore = create<HabitState>((set, get) => ({
-  habits: [],
-  logs: [],
-  addHabit: (h) =>
-    set((state) => ({
-      habits: [...state.habits, { ...h, id: uuidv4(), createdAt: Date.now(), archived: false }],
-    })),
-  archiveHabit: (id) =>
-    set((state) => ({
-      habits: state.habits.map((h) => (h.id === id ? { ...h, archived: true } : h)),
-    })),
-  logHabit: (habitId, date) => {
-    if (get().isCompleted(habitId, date)) return
-    set((state) => ({
-      logs: [...state.logs, { id: uuidv4(), habitId, date, completedAt: Date.now() }],
-    }))
-  },
-  unlogHabit: (habitId, date) =>
-    set((state) => ({
-      logs: state.logs.filter((l) => !(l.habitId === habitId && l.date === date)),
-    })),
-  isCompleted: (habitId, date) =>
-    get().logs.some((l) => l.habitId === habitId && l.date === date),
-  getStreak: (habitId) => {
-    const logDates = new Set(
-      get().logs.filter((l) => l.habitId === habitId).map((l) => l.date)
-    )
-    if (logDates.size === 0) return 0
-    let streak = 0
-    const current = new Date()
-    for (let i = 0; i < 365; i++) {
-      const dateStr = current.toISOString().split('T')[0]
-      if (logDates.has(dateStr)) {
-        streak++
-        current.setDate(current.getDate() - 1)
-      } else {
-        break
-      }
-    }
-    return streak
-  },
-}))
+export const useHabitStore = create<HabitState>()(
+  persist(
+    (set, get) => ({
+      habits: [],
+      logs: [],
+      addHabit: (h) =>
+        set((state) => ({
+          habits: [...state.habits, { ...h, id: uuidv4(), createdAt: Date.now(), archived: false }],
+        })),
+      archiveHabit: (id) =>
+        set((state) => ({
+          habits: state.habits.map((h) => (h.id === id ? { ...h, archived: true } : h)),
+        })),
+      logHabit: (habitId, date) => {
+        if (get().isCompleted(habitId, date)) return
+        set((state) => ({
+          logs: [...state.logs, { id: uuidv4(), habitId, date, completedAt: Date.now() }],
+        }))
+      },
+      unlogHabit: (habitId, date) =>
+        set((state) => ({
+          logs: state.logs.filter((l) => !(l.habitId === habitId && l.date === date)),
+        })),
+      isCompleted: (habitId, date) =>
+        get().logs.some((l) => l.habitId === habitId && l.date === date),
+      getStreak: (habitId) => {
+        const logDates = new Set(
+          get().logs.filter((l) => l.habitId === habitId).map((l) => l.date)
+        )
+        if (logDates.size === 0) return 0
+        let streak = 0
+        const current = new Date()
+        for (let i = 0; i < 365; i++) {
+          const dateStr = current.toISOString().split('T')[0]
+          if (logDates.has(dateStr)) {
+            streak++
+            current.setDate(current.getDate() - 1)
+          } else {
+            break
+          }
+        }
+        return streak
+      },
+    }),
+    { name: 'habits', storage: createJSONStorage(() => AsyncStorage) }
+  )
+)

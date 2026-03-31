@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export interface TodayStats {
   steps: number
@@ -20,9 +22,14 @@ interface FitnessState {
   setLastSyncAt: (ts: number) => void
 }
 
-export const useFitnessStore = create<FitnessState>((set) => ({
-  todayStats: null,
-  lastSyncAt: null,
-  setTodayStats: (stats) => set({ todayStats: stats }),
-  setLastSyncAt: (ts) => set({ lastSyncAt: ts }),
-}))
+export const useFitnessStore = create<FitnessState>()(
+  persist(
+    (set) => ({
+      todayStats: null,
+      lastSyncAt: null,
+      setTodayStats: (stats) => set({ todayStats: stats }),
+      setLastSyncAt: (ts) => set({ lastSyncAt: ts }),
+    }),
+    { name: 'fitness', storage: createJSONStorage(() => AsyncStorage) }
+  )
+)

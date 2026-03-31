@@ -24,22 +24,29 @@ export function ImpulseBuyVault() {
 
   const pending = items.filter((i) => i.status === 'pending')
   const skipped = items.filter((i) => i.status === 'skipped')
+  const bought = items.filter((i) => i.status === 'bought')
   const totalSaved = skipped.reduce((sum, i) => sum + i.price, 0)
 
-  if (pending.length === 0 && skipped.length === 0) {
+  if (items.length === 0) {
     return (
-      <View className="items-center py-8">
-        <Text className="text-gray-400 text-sm">No impulse buys tracked yet</Text>
+      <View className="items-center py-16 px-8">
+        <Text className="text-4xl mb-3">🛑</Text>
+        <Text className="text-lg font-semibold text-gray-700 mb-1">Impulse Vault is empty</Text>
+        <Text className="text-sm text-gray-400 text-center">Tap + to add something you want to buy — then wait before deciding</Text>
       </View>
     )
   }
 
   return (
-    <ScrollView>
+    <ScrollView className="flex-1">
       {totalSaved > 0 && (
         <View className="mx-4 mb-4 bg-green-50 rounded-xl p-4">
           <Text className="text-green-700 font-semibold">💰 Saved by skipping: ${totalSaved.toFixed(2)}</Text>
         </View>
+      )}
+
+      {pending.length > 0 && (
+        <Text className="mx-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Waiting</Text>
       )}
       {pending.map((item) => (
         <View key={item.id} className="mx-4 mb-3 bg-white rounded-xl p-4 shadow-sm">
@@ -70,6 +77,32 @@ export function ImpulseBuyVault() {
           </View>
         </View>
       ))}
+
+      {skipped.length > 0 && (
+        <>
+          <Text className="mx-4 mt-2 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Skipped</Text>
+          {skipped.map((item) => (
+            <View key={item.id} className="mx-4 mb-2 bg-white rounded-xl px-4 py-3 flex-row justify-between items-center opacity-60">
+              <Text className="text-gray-600 line-through">{item.itemName}</Text>
+              <Text className="text-green-600 font-medium text-sm">saved ${item.price.toFixed(2)}</Text>
+            </View>
+          ))}
+        </>
+      )}
+
+      {bought.length > 0 && (
+        <>
+          <Text className="mx-4 mt-2 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Bought</Text>
+          {bought.map((item) => (
+            <View key={item.id} className="mx-4 mb-2 bg-white rounded-xl px-4 py-3 flex-row justify-between items-center opacity-60">
+              <Text className="text-gray-600">{item.itemName}</Text>
+              <Text className="text-gray-500 text-sm">${item.price.toFixed(2)}</Text>
+            </View>
+          ))}
+        </>
+      )}
+
+      <View className="h-24" />
     </ScrollView>
   )
 }
